@@ -1,13 +1,12 @@
 package com.mcnsa.chatserver;
 
 import java.io.BufferedReader;
-import java.io.IOException;
 import java.io.InputStreamReader;
 import java.net.Socket;
-import java.net.SocketException;
 
 public class ChatListenConnection extends Thread {
 	private Socket connection = null;
+	private boolean done = false;
 	
 	public ChatListenConnection(Socket _connection) {
 		// store our connection!
@@ -25,19 +24,20 @@ public class ChatListenConnection extends Thread {
 			BufferedReader in = new BufferedReader(new InputStreamReader(connection.getInputStream()));
 			
 			// grab a line
-			while(true) {
+			while(!done) {
 				try {
+					// prefix info and grab a line from the client
 					String line = "[" + connection.getInetAddress() + ":" + connection.getPort() + "] " + in.readLine();
 					// and broadcast it back out!
 					MCNSAChatServer.broadcast(line);
 				}
-				catch(SocketException e) {
+				catch(Exception e) {
+					// close our buffered read
 					in.close();
+					// disconnect this client
 					MCNSAChatServer.disconnect(this);
-				}
-				catch(IOException e) {
-					in.close();
-					MCNSAChatServer.disconnect(this);
+					// and finish this thread
+					done = true;
 				}
 			}
 		}

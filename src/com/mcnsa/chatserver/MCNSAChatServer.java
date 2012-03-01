@@ -14,6 +14,7 @@ public class MCNSAChatServer {
 	public static void main(String argv[]) throws Exception {
 		// create the server socket
 		servSock = new ServerSocket(2288);
+		System.out.println("Server started on port 2288");
 		
 		// and begin listening!
 		while(!quit) {
@@ -40,18 +41,20 @@ public class MCNSAChatServer {
 			// and write to it!
 			out.writeBytes(message + "\n");
 			out.flush();
-			
-			System.out.println(message);
-			
-			// and close up
-			//out.close();
 		}
+		
+		// locally record the message
+		System.out.println(message);
 	}
 	
 	public static void disconnect(ChatListenConnection connection) throws IOException {
+		// create a disconnect message
 		String message = new String("Client on: " + connection.getSocket().getInetAddress() + ":" + connection.getSocket().getPort() + " disconnected!");
+		// close the socket
 		connection.getSocket().close();
+		// remove the connection from our list
 		connections.remove(connection);
+		// and broadcast the result
 		broadcast(message);
 	}
 }
