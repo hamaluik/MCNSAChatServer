@@ -12,9 +12,18 @@ public class MCNSAChatServer {
 	private static ArrayList<ChatListenConnection> connections = new ArrayList<ChatListenConnection>();
 	
 	public static void main(String argv[]) throws Exception {
+		// get the desired port
+		Integer port = 9345;
+		if(argv.length == 1) {
+			try {
+				port = Integer.parseInt(argv[0]);
+			}
+			catch(Exception e) {}
+		}
+		
 		// create the server socket
-		servSock = new ServerSocket(2288);
-		System.out.println("Server started on port 2288");
+		servSock = new ServerSocket(port);
+		System.out.println("Server started on port " + port);
 		
 		// and begin listening!
 		while(!quit) {
@@ -29,9 +38,14 @@ public class MCNSAChatServer {
 		}
 	}
 	
-	public static void broadcast(String message) throws IOException {
+	public static void broadcast(String message, ChatListenConnection omitConnection) throws IOException {
 		// loop through all connections
 		for(int i = 0; i < connections.size(); i++) {
+			// make sure we're not broadcasting back to the sender
+			if(omitConnection.equals(connections.get(i))) {
+				continue;
+			}
+			
 			// get the socket
 			Socket connection = connections.get(i).getSocket();
 			
@@ -44,17 +58,15 @@ public class MCNSAChatServer {
 		}
 		
 		// locally record the message
-		System.out.println(message);
+		System.out.println("{" + omitConnection.getSocket().getInetAddress() + ":" + omitConnection.getSocket().getInetAddress() + "} " + message);
 	}
 	
 	public static void disconnect(ChatListenConnection connection) throws IOException {
-		// create a disconnect message
-		String message = new String("Client on: " + connection.getSocket().getInetAddress() + ":" + connection.getSocket().getPort() + " disconnected!");
+		// write a disconnect message
+		System.out.println("Client on: " + connection.getSocket().getInetAddress() + ":" + connection.getSocket().getPort() + " disconnected!");
 		// close the socket
 		connection.getSocket().close();
 		// remove the connection from our list
 		connections.remove(connection);
-		// and broadcast the result
-		broadcast(message);
 	}
 }

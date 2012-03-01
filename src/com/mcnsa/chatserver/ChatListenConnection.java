@@ -27,9 +27,9 @@ public class ChatListenConnection extends Thread {
 			while(!done) {
 				try {
 					// prefix info and grab a line from the client
-					String line = "[" + connection.getInetAddress() + ":" + connection.getPort() + "] " + in.readLine();
+					String line = in.readLine();
 					// and broadcast it back out!
-					MCNSAChatServer.broadcast(line);
+					MCNSAChatServer.broadcast(line, this);
 				}
 				catch(Exception e) {
 					// close our buffered read
