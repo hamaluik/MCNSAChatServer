@@ -58,7 +58,7 @@ public class MCNSAChatServer {
 		}
 		
 		// locally record the message
-		System.out.println("{" + omitConnection.getSocket().getInetAddress() + ":" + omitConnection.getSocket().getInetAddress() + "} " + message);
+		System.out.println("{" + omitConnection.getSocket().getInetAddress() + ":" + omitConnection.getSocket().getPort() + "} " + message);
 	}
 	
 	public static void disconnect(ChatListenConnection connection) throws IOException {

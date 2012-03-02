@@ -1,6 +1,7 @@
 package com.mcnsa.chatserver;
 
 import java.io.BufferedReader;
+import java.io.IOException;
 import java.io.InputStreamReader;
 import java.net.Socket;
 
@@ -28,6 +29,12 @@ public class ChatListenConnection extends Thread {
 				try {
 					// prefix info and grab a line from the client
 					String line = in.readLine();
+					
+					// catch nulls
+					if(line == null) {
+						throw new IOException("caught null line from client");
+					}
+					
 					// and broadcast it back out!
 					MCNSAChatServer.broadcast(line, this);
 				}
